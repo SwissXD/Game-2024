@@ -9,58 +9,57 @@
 #include <iostream>
 #include <ctime>
 
-class GameToken
-{
-    private:
-        unsigned Counter;
-
-    public:
-        unsigned Position;
-
-        GameToken(unsigned counter, unsigned pos): Counter(counter), Position(pos)
-        {
-        }
-
-        GameToken(unsigned counter): Counter(counter), Position(0)
-        {
-
-        }
-        GameToken(): Counter(0), Position(0)
-        {
-
-        }
-
-        unsigned getCounter()
-        {
-            return this->Counter;
-        }
-
-        GameToken& operator+=(GameToken const& val)
-        {
-            this->Counter += val.Counter;
-            return *this;
-        }
-
-        bool operator== (GameToken const& val) const
-        {
-            return this->Counter == Counter;
-        }
-
-        friend std::ostream& operator<< (std::ostream& Stream, GameToken const& Object)
-        {
-            Stream << Object.Counter;
-            return Stream;
-        }
-};
 
 
 class _2024Board
 {
     private:
-        GameToken Tokens[16] = { 0 };
+        unsigned Tokens[16];
+
+
+    void setFreePos(unsigned NumbOfPos)
+    {
+        for(std::size_t j = 0; j < NumbOfPos; ++j)
+        {
+            unsigned FreePos = 0;
+            for(std::size_t i = 0; i < 16; ++i)
+            {
+                if(Tokens[i]==0)
+                {
+                    ++FreePos;
+                }
+            }
+
+            std::srand(std::time(0));
+            unsigned RandNumb = std::rand()%FreePos;
+
+            FreePos = 0;
+            for(std::size_t i = 0; i < 16; ++i)
+            {
+                if(Tokens[i]==0)
+                {
+                    ++FreePos;
+                }
+
+                if(RandNumb == FreePos)
+                {
+                    unsigned temp = std::rand()%2;
+                    if(temp)
+                    {
+                        Tokens[i] = 2;
+                    }
+                    else
+                    {
+                        Tokens[i] = 4;
+                    }
+                }
+            }
+        }
+
+    }
 
     public:
-        _2024Board()
+        _2024Board(): Tokens{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
         {
 
         }
@@ -76,6 +75,11 @@ class _2024Board
             }
         }
         return Stream;
+    }
+
+    void StartGame()
+    {
+        this->setFreePos(2);
     }
 };
 

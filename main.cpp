@@ -10,5 +10,6 @@
 int main()
 {
     _2024Board t1;
+    t1.StartGame();
     std::cout << t1;
 }
