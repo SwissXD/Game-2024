@@ -9,6 +9,7 @@
 #include <iostream>
 #include <ctime>
 
+#define empty 0
 
 
 class _2024Board
@@ -55,11 +56,10 @@ class _2024Board
                 }
             }
         }
-
     }
 
-    public:
-        _2024Board(): Tokens{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    public:                 //0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0}
         {
 
         }
@@ -80,6 +80,27 @@ class _2024Board
     void StartGame()
     {
         this->setFreePos(2);
+    }
+
+    void MoveUp()
+    {
+        // 0  1  2  3
+        // 4  5  6  7
+        // 8  9 10 11
+        //12 13 14 15
+
+        for(std::size_t i = 0; i < 4; ++i)
+        {
+            for(std::size_t j = 4; j< 16; j+=4)
+            {
+                if(this->Tokens[i] == this->Tokens[i+j])
+                {
+                    this->Tokens[i] += this->Tokens[i+j];
+                    this->Tokens[i+j] = empty;
+                    j+=4;
+                }
+            }
+        }
     }
 };
 
