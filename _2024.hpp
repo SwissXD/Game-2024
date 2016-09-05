@@ -30,12 +30,12 @@ class _2024Board
                         ++FreePos;
                     }
                 }
+                //if(FreePos == 0)
+                //{
+                    //throw shitshit
+                //}
                 std::srand(std::time(0));
-                unsigned RandNumb = 0;
-                while(RandNumb == 0)
-                {
-                  RandNumb = std::rand()%FreePos;
-                }
+                unsigned RandNumb = (std::rand()%FreePos)+1;
 
                 FreePos = 0;
                 for(std::size_t i = 0; i < 16; ++i)
@@ -62,7 +62,7 @@ class _2024Board
         }
 
     public:                 //0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0}
+        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0}
         {
 
         }
@@ -115,11 +115,8 @@ class _2024Board
                             this->Tokens[c+4] = empty;
                         }
                     }
-
                 }
             }
-            //Sumup
-
         }
 };
 
