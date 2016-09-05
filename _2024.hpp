@@ -106,15 +106,11 @@ class _2024Board
                         this->Tokens[counter+4] = empty;
                         counter+=4;
                     }
-
-                    for(std::size_t c = i; c < i+12; c+=4)
-                    {
-                        if(this->Tokens[c] == this->Tokens[c+4])
+                        if(this->Tokens[j] == this->Tokens[j+4])
                         {
-                            this->Tokens[c]*=2;
-                            this->Tokens[c+4] = empty;
+                            this->Tokens[j] *= 2;
+                            this->Tokens[j+4] = empty;
                         }
-                    }
                 }
             }
         }
