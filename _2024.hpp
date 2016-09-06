@@ -20,33 +20,36 @@ class _2024Board
 
         void setFreePos(unsigned NumbOfPos)
         {
+            unsigned FreePos = 0;
+            for(std::size_t i = 0; i < 16; ++i)
+            {
+                if(Tokens[i] == empty)
+                {
+                    ++FreePos;
+                }
+            }
+            //if(FreePos == 0)
+            //{
+                //throw shitshit
+            //}
             for(std::size_t j = 0; j < NumbOfPos; ++j)
             {
-                unsigned FreePos = 0;
-                for(std::size_t i = 0; i < 16; ++i)
-                {
-                    if(Tokens[i]==0)
-                    {
-                        ++FreePos;
-                    }
-                }
-                //if(FreePos == 0)
-                //{
-                    //throw shitshit
-                //}
+               // std::cout << "j: " << j << '\n';
                 std::srand(std::time(0));
                 unsigned RandNumb = (std::rand()%FreePos)+1;
 
-                FreePos = 0;
+                unsigned countPos = 0;
                 for(std::size_t i = 0; i < 16; ++i)
                 {
-                    if(Tokens[i]==0)
+                    if(Tokens[i] == empty)
                     {
-                        ++FreePos;
+                        ++countPos;
                     }
 
-                    if(RandNumb == FreePos)
+                    if(RandNumb == countPos)
                     {
+                        //std::cout << "RandNumb: " << RandNumb << '\n';
+                       // std::cout << "i: " << i << '\n';
                         unsigned temp = std::rand()%2;
                         if(temp)
                         {
@@ -56,13 +59,15 @@ class _2024Board
                         {
                             Tokens[i] = 4;
                         }
+                        i=16;
                     }
                 }
+                --FreePos;
             }
         }
 
     public:                 //0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0, 8, 0, 0, 0}
+        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 4, 0, 0, 4, 0, 0, 0, 8, 4, 0, 0}
         {
 
         }
@@ -99,6 +104,27 @@ class _2024Board
             {
                 for(std::size_t j = i; j < i+12; j+=4)
                 {
+                    while(this->Tokens[j] == empty)
+                    {
+                        j+=4;
+                    }
+
+                    unsigned j2 = j+4;
+                    while(this->Tokens[j2] == empty)
+                    {
+                        j2+=4;
+                    }
+
+                    if(this->Tokens[j] == this->Tokens[j2])
+                    {
+                        this->Tokens[j] *= 2;
+                        this->Tokens[j2] = empty;
+                        j+=4;
+                    }
+                }
+
+                for(std::size_t j = i; j < i+12; j+=4)
+                {
                     unsigned counter = j;
                     while(this->Tokens[j] == empty && counter < i+12)
                     {
@@ -106,11 +132,6 @@ class _2024Board
                         this->Tokens[counter+4] = empty;
                         counter+=4;
                     }
-                        if(this->Tokens[j] == this->Tokens[j+4])
-                        {
-                            this->Tokens[j] *= 2;
-                            this->Tokens[j+4] = empty;
-                        }
                 }
             }
         }
