@@ -67,7 +67,7 @@ class _2024Board
         }
 
     public:                 //0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-        _2024Board(): Tokens{ 2, 0, 0, 0, 2, 4, 0, 0, 4, 0, 0, 0, 8, 4, 0, 0}
+        _2024Board(): Tokens{ 2, 0, 0, 0, 0, 4, 0, 0, 2, 0, 4, 0, 0, 4, 4, 0}
         {
 
         }
@@ -102,15 +102,16 @@ class _2024Board
             //clear empty Token
             for(std::size_t i = 0; i < 4; ++i)
             {
-                for(std::size_t j = i; j < i+12; j+=4)
+                for(std::size_t j = i; j < i+8; j+=4)
                 {
-                    while(this->Tokens[j] == empty)
+
+                    while(this->Tokens[j] == empty && j < 12)
                     {
                         j+=4;
                     }
 
                     unsigned j2 = j+4;
-                    while(this->Tokens[j2] == empty)
+                    while(this->Tokens[j2] == empty && j2 < 12)
                     {
                         j2+=4;
                     }
@@ -119,7 +120,10 @@ class _2024Board
                     {
                         this->Tokens[j] *= 2;
                         this->Tokens[j2] = empty;
-                        j+=4;
+                        if(j < 12)
+                        {
+                            j+=4;
+                        }
                     }
                 }
 
