@@ -1,247 +1,149 @@
-//_2024.hpp
-
-//--------------------------
-// GameProjekt: 2024
-// Tkel
-// Data 30.08.2016
-//--------------------------
+//--------------------------------------//
+// creat date 16.01.2016
+// autor: tkel
+//--------------------------------------//
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <ctime>
+#include <array>
+#include <cassert>
+#include <random>
 
-#define empty 0
-
-
-class _2024Board
+enum class Colour
 {
-    private:
-        unsigned Tokens[16];
+    Grew,
+    bYellow,
+    Yellow,
+    dYellow,
+    Orange,
+    dOrange,
+    Red,
+    dRed
 
-
-        void setFreePos(unsigned NumbOfPos)
-        {
-            unsigned FreePos = 0;
-            for(std::size_t i = 0; i < 16; ++i)
-            {
-                if(Tokens[i] == empty)
-                {
-                    ++FreePos;
-                }
-            }
-            //if(FreePos == 0)
-            //{
-                //throw shitshit
-            //}
-            for(std::size_t j = 0; j < NumbOfPos; ++j)
-            {
-               // std::cout << "j: " << j << '\n';
-                std::srand(std::time(0));
-                unsigned RandNumb = (std::rand()%FreePos)+1;
-
-                unsigned countPos = 0;
-                for(std::size_t i = 0; i < 16; ++i)
-                {
-                    if(Tokens[i] == empty)
-                    {
-                        ++countPos;
-                    }
-
-                    if(RandNumb == countPos)
-                    {
-                        //std::cout << "RandNumb: " << RandNumb << '\n';
-                       // std::cout << "i: " << i << '\n';
-                        unsigned temp = std::rand()%2;
-                        if(temp)
-                        {
-                            Tokens[i] = 2;
-                        }
-                        else
-                        {
-                            Tokens[i] = 4;
-                        }
-                        i=16;
-                    }
-                }
-                --FreePos;
-            }
-        }
-
-    public:                 //0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-        _2024Board(): Tokens{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8}
-        {
-
-        }
-
-        friend std::ostream& operator<<(std::ostream& Stream, _2024Board const& Obj)
-        {
-            for(std::size_t i = 0; i < 16; ++i)
-            {
-                Stream << Obj.Tokens[i] << "\t";
-                if((i+1)%4 == 0)
-                {
-                    Stream << '\n';
-                }
-            }
-            return Stream;
-        }
-
-        void StartGame()
-        {
-            this->setFreePos(2);
-        }
-
-        void MoveDown()
-        {
-             //------------//
-            // 0  1  2  3 //
-            // 4  5  6  7 //
-            // 8  9 10 11 //
-            //12 13 14 15 //
-            //------------//
-
-            //summUp Token
-            for(std::size_t i = 12; i < 16; ++i)
-            {
-                for(std::size_t j = i; j > i-7; j-=4)
-                {
-                    std::cout << "i: " << i << '\n' ;
-                    while(this->Tokens[j] == empty && j > 4)
-                    {
-                        j-=4;
-                    }
-
-                    unsigned j2 = j-4;
-                    /*if(j > 4)
-                    {
-                        j2 = j-4;
-                    }*/
-
-                    while(this->Tokens[j2] == empty && j2 > 4)
-                    {
-                        j2-=4;
-                    }
-                    std::cout << "j:   " << j << '\n';
-                    std::cout << "j2:  " << j2 << '\n';
-                    if(this->Tokens[j] == this->Tokens[j2])
-                    {
-                        this->Tokens[j] *= 2;
-                        this->Tokens[j2] = empty;
-                        if(j > 4)
-                        {
-                            j-=4;
-                        }
-                    }
-                }
-
-                for(std::size_t j = i; j > i-12; j-=4)
-                {
-                    unsigned counter = j;
-                    while(this->Tokens[j] == empty && counter > i-12)
-                    {
-                        this->Tokens[j] = this->Tokens[counter-4];
-                        this->Tokens[counter-4] = empty;
-                        counter-=4;
-                    }
-                }
-            }
-        }
-
-        void MoveUp()
-        {
-            //------------//
-            // 0  1  2  3 //
-            // 4  5  6  7 //
-            // 8  9 10 11 //
-            //12 13 14 15 //
-            //------------//
-
-            //clear empty Token
-            for(std::size_t i = 0; i < 4; ++i)
-            {
-                for(std::size_t j = i; j < i+8; j+=4)
-                {
-                    while(this->Tokens[j] == empty && j < 12)
-                    {
-                        j+=4;
-                    }
-
-                    unsigned j2 = j+4;
-                    while(this->Tokens[j2] == empty && j2 < 12)
-                    {
-                        j2+=4;
-                    }
-
-                    if(this->Tokens[j] == this->Tokens[j2])
-                    {
-                        this->Tokens[j] *= 2;
-                        this->Tokens[j2] = empty;
-                        if(j < 12)
-                        {
-                            j+=4;
-                        }
-                    }
-                }
-
-                for(std::size_t j = i; j < i+12; j+=4)
-                {
-                    unsigned counter = j;
-                    while(this->Tokens[j] == empty && counter < i+12)
-                    {
-                        this->Tokens[j] = this->Tokens[counter+4];
-                        this->Tokens[counter+4] = empty;
-                        counter+=4;
-                    }
-                }
-            }
-        }
-
-        void MoveRight()
-        {
-            //------------//
-            // 0  1  2  3 //
-            // 4  5  6  7 //
-            // 8  9 10 11 //
-            //12 13 14 15 //
-            //------------//
-
-            //clear empty Token
-            for(std::size_t i = 3; i < 15; i+=4)
-            {
-                for(std::size_t j = i; j > i-3; --j)
-                {
-                    while(this->Tokens[j] == empty && j > i-3)
-                    {
-                        --j;
-                    }
-
-                    unsigned j2 = j-1;
-                    while(this->Tokens[j2] == empty && j2 > i-3)
-                    {
-                        --j2;
-                    }
-
-                    if(this->Tokens[j] == this->Tokens[j2])
-                    {
-                        this->Tokens[j] *= 2;
-                        this->Tokens[j2] = empty;
-                        if(j > i-4)
-                        {
-                            --j;
-                        }
-                    }
-                }
-
-                for(std::size_t j = i; j > i-3; --j)
-                {
-                    unsigned counter = j;
-                    while(this->Tokens[j] == empty && counter > i-3)
-                    {
-                        this->Tokens[j] = this->Tokens[counter-1];
-                        this->Tokens[counter-1] = empty;
-                        --counter;
-                    }
-                }
-            }
-        }
 };
 
+enum class Cardinals
+{
+	Top,
+	Right,
+	Bottom,
+	Left
+};
+
+
+struct Field
+{
+    std::size_t mValue;
+    std::size_t x;
+    std::size_t y;
+    Colour mColour;
+
+    Field(std::size_t value): mValue(value), mColour(Colour::Grew), x(0),y(0)
+    {}
+    Field(): mValue(0), mColour(Colour::Grew), x(0),y(0)
+    {}
+
+
+    Field(std::size_t xPos, std::size_t yPos,std::size_t value): mValue(value), mColour(Colour::Grew), x(xPos),y(yPos)
+    {}
+
+};
+
+class Game
+{
+    enum
+    {
+        mWidht = 4,
+        mHeight = 4,
+    };
+    std::array<Field, 16> mPuzzle;
+
+    std::minstd_rand mEngine{ std::random_device{}() };
+	std::uniform_int_distribution<std::size_t> mValueDist{ 0, 4 };
+	std::uniform_int_distribution<std::size_t> mPosDist  { 0, mWidht*mHeight };
+
+    void addNumber()
+    {
+        for(;;)
+        {
+            std::size_t Pos = mPosDist(mEngine);
+            if(mPuzzle[Pos].mValue == 0)
+            {
+                switch(mValueDist(mEngine))
+                {
+                case 0:
+                    mPuzzle[Pos].mValue = 2;
+                    break;
+                case 1:
+                    mPuzzle[Pos].mValue = 4;
+                    break;
+                case 2:
+                    mPuzzle[Pos].mValue = 8;
+                    break;
+                case 3:
+                    mPuzzle[Pos].mValue = 16;
+                    break;
+                default:
+                    assert(false);
+                }
+            }
+            break;
+        }
+    }
+
+    void tiltBoard(Cardinals Direction)
+    {
+        switch(Direction)
+	    {
+        case Cardinals::Top:
+            break;
+        case Cardinals::Right:
+            break;
+        case Cardinals::Bottom:
+            break;
+        case Cardinals::Left:
+            break;
+        default:
+            assert(false);
+	    }
+    }
+
+    void TiltUp()
+    {
+        for(std::size_t row = 0; row < mWidht; ++row)
+            for(std::size_t i = row; row < mWidht*mHeight; i+=4)
+            {
+                if(mPuzzle[i].mValue == 0)
+                {
+                    //for
+                }
+            }
+    }
+
+public:
+    Game()
+    {
+        for(std::size_t x = 0; x < mWidht; ++x)
+            for(std::size_t y = 0; y < mHeight; ++y)
+            {
+                mPuzzle[(x*mWidht)+y].x = x;
+                mPuzzle[(x*mWidht)+y].y = y;
+            }
+
+        this->addNumber();
+        this->addNumber();
+    }
+
+    friend std::ostream& operator<<(std::ostream& Stream, Game const& Obj)
+    {
+        for(std::size_t x = 0; x < mWidht; ++x)
+        {
+            for(std::size_t y = 0; y < mHeight; ++y)
+            {
+                Stream << '[' << Obj.mPuzzle[(x*mWidht)+y].mValue << ']' << " ";
+            }
+            Stream << '\n';
+        }
+        return Stream;
+    }
+};
