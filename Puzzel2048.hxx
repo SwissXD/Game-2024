@@ -11,15 +11,19 @@
 
 enum class Colour
 {
-    Grew,
-    bYellow,
-    Yellow,
-    dYellow,
-    Orange,
-    dOrange,
-    Red,
-    dRed
-
+    dGrew   =  2,
+    Grew    =  4,
+    bGrew   =  8,
+    bYellow =  16,
+    Yellow  =  32,
+    dYellow =  64,
+    Orange  = 128,
+    dOrange = 256,
+    Red     = 512,
+    dRed    =1024,
+    Pink    =2048,
+    dPink   =4096,
+    bBlue   =8192
 };
 
 enum class Cardinals
@@ -46,6 +50,7 @@ struct Field
     void Double()
     {
         mValue += mValue;
+        //mColour = mValue;
     }
 
     void Reset()
@@ -56,10 +61,9 @@ struct Field
 
     Field(std::size_t xPos, std::size_t yPos,std::size_t value): mValue(value), mColour(Colour::Grew), x(xPos),y(yPos)
     {}
-
-
-
 };
+
+
 
 class Game
 {
@@ -70,9 +74,19 @@ class Game
     };
     std::array<Field, 16> mPuzzle;
 
+    unsigned long long mScore;
+
     std::minstd_rand mEngine{ std::random_device{}() };
 	std::uniform_int_distribution<std::size_t> mValueDist{ 0, 4 };
 	std::uniform_int_distribution<std::size_t> mPosDist  { 0, mWidht*mHeight };
+
+    void scored(std::size_t currField, std::size_t nextField)
+    {
+        this->mScore += mPuzzle[currField].mValue;
+        mPuzzle[currField].Double();
+        mPuzzle[nextField].Reset();
+    }
+
 
     void addNumber()
     {
@@ -116,6 +130,113 @@ class Game
         return true;
     }
 
+    void TiltLeft()
+    {
+        for(std::size_t row = 0; row < mWidht*mHeight; row+=mWidht)
+        {
+            bool ColumnDone = false;
+            std::size_t currField = row;
+            //std::cout << "F0::row: " << row << "\n";
+            while(!ColumnDone)
+            {
+                //std::cout << "W0::currField: " << currField << "\n";
+                std::size_t nextField = currField + 1;
+                while(mPuzzle[currField].mValue == 0 && nextField <= row+(mHeight-1))
+                {
+                    //std::cout << "W1::nextField: " << nextField << "\n";
+                    if(mPuzzle[nextField].mValue != 0)
+                    {
+                        mPuzzle[currField] = mPuzzle[nextField];
+                        mPuzzle[nextField].Reset();
+                        nextField = mWidht*mHeight; //leave loop
+                    }
+                    else if(mPuzzle[nextField].mValue == 0)
+                    {
+                        ++nextField;
+                    }
+                }
+
+                nextField = currField + 1;
+                while(mPuzzle[currField].mValue != 0 && nextField <= row+(mHeight-1))
+                {
+                    //std::cout << "W2::nextField: " << nextField << "\n";
+                    if(mPuzzle[nextField].mValue == 0)
+                    {
+                        ++nextField;
+                    }
+                    else if(mPuzzle[currField].mValue == mPuzzle[nextField].mValue)
+                    {
+                        this->scored(currField,nextField);
+                        nextField = mWidht*mHeight;//leave loop
+                    }
+                    else if(mPuzzle[currField].mValue != mPuzzle[nextField].mValue)
+                    {
+                        nextField = mWidht*mHeight;//leave loop
+                    }
+                }
+                ++currField;
+                if(currField >= row+(mHeight-1))
+                {
+                    ColumnDone = true;
+                }
+            }
+        }
+    }
+
+
+    void TiltRight()
+    {
+        for(int row = (mWidht-1); row < mWidht*mHeight; row+=mWidht)
+        {
+            bool ColumnDone = false;
+            int currField = row;
+            //std::cout << "F0::row: " << row << "\n";
+            while(!ColumnDone)
+            {
+                //std::cout << "W0::currField: " << currField << "\n";
+                int nextField = currField - 1;
+                while(mPuzzle[currField].mValue == 0 && nextField >= row-(mHeight-1))
+                {
+                    //std::cout << "W1::nextField: " << nextField << "\n";
+                    if(mPuzzle[nextField].mValue != 0)
+                    {
+                        mPuzzle[currField] = mPuzzle[nextField];
+                        mPuzzle[nextField].Reset();
+                        nextField = - 1; //leave loop
+                    }
+                    else if(mPuzzle[nextField].mValue == 0)
+                    {
+                        --nextField;
+                    }
+                }
+
+                nextField = currField - 1;
+                while(mPuzzle[currField].mValue != 0 && nextField >= row-(mHeight-1))
+                {
+                    //std::cout << "W2::nextField: " << nextField << "\n";
+                    if(mPuzzle[nextField].mValue == 0)
+                    {
+                        --nextField;
+                    }
+                    else if(mPuzzle[currField].mValue == mPuzzle[nextField].mValue)
+                    {
+                        this->scored(currField,nextField);
+                        nextField = -1;//leave loop
+                    }
+                    else if(mPuzzle[currField].mValue != mPuzzle[nextField].mValue)
+                    {
+                        nextField = -1;//leave loop
+                    }
+                }
+                --currField;
+                if(currField <= row-(mHeight-1))
+                {
+                    ColumnDone = true;
+                }
+            }
+        }
+    }
+
     void TiltUp()
     {
         for(std::size_t column = 0; column < mWidht; ++column)
@@ -151,8 +272,7 @@ class Game
                     }
                     else if(mPuzzle[currField].mValue == mPuzzle[nextField].mValue)
                     {
-                        mPuzzle[currField].Double();
-                        mPuzzle[nextField].Reset();
+                        this->scored(currField,nextField);
                         nextField = mWidht*mHeight;
                     }
                     else if(mPuzzle[currField].mValue != mPuzzle[nextField].mValue)
@@ -171,18 +291,15 @@ class Game
 
     void TiltDown()
     {
-        for(std::size_t column = 12; column < mWidht; ++column)
+        for(std::size_t column = mWidht*(mHeight-1); column < mWidht*mHeight; ++column)
         {
             bool ColumnDone = false;
-            std::size_t currField = column;
-            std::cout << "***D0***\n";
+            int currField = column;
             while(!ColumnDone)
             {
-                std::cout << "***D0***\n";
                 int nextField = currField - mHeight;
-                while(mPuzzle[currField].mValue == 0 && nextField > 0)
+                while(mPuzzle[currField].mValue == 0 && nextField >= 0)
                 {
-                    std::cout << "***D1***\n";
                     if(mPuzzle[nextField].mValue != 0)
                     {
                         mPuzzle[currField] = mPuzzle[nextField];
@@ -196,17 +313,15 @@ class Game
                 }
 
                 nextField = currField - mHeight;
-                while(mPuzzle[currField].mValue != 0 && nextField > 0)
+                while(mPuzzle[currField].mValue != 0 && nextField >= 0)
                 {
-                    std::cout << "***D2***\n";
                     if(mPuzzle[nextField].mValue == 0)
                     {
                         nextField -= mHeight;
                     }
                     else if(mPuzzle[currField].mValue == mPuzzle[nextField].mValue)
                     {
-                        mPuzzle[currField].Double();
-                        mPuzzle[nextField].Reset();
+                        this->scored(currField,nextField);
                         nextField = -1;
                     }
                     else if(mPuzzle[currField].mValue != mPuzzle[nextField].mValue)
@@ -215,6 +330,7 @@ class Game
                     }
                 }
                 currField -= mHeight;
+                //std::cout << "currField" << currField << "\n";
                 if(currField < 0)
                 {
                     ColumnDone = true;
@@ -232,27 +348,28 @@ public:
                 mPuzzle[(x*mWidht)+y].x = x;
                 mPuzzle[(x*mWidht)+y].y = y;
             }
+        mScore = 0;
 
        // this->addNumber();
         //this->addNumber();
        mPuzzle[0].mValue  = 8;
-       mPuzzle[4].mValue  = 8;
+       mPuzzle[4].mValue  = 16;
        mPuzzle[8].mValue  = 16;
        mPuzzle[12].mValue = 16;
 
        mPuzzle[1].mValue  = 2;
-       mPuzzle[5].mValue  = 0;
-       mPuzzle[9].mValue  = 0;
+       mPuzzle[5].mValue  = 2;
+       mPuzzle[9].mValue  = 2;
        mPuzzle[13].mValue = 2;
 
-       mPuzzle[2].mValue  = 0;
+       mPuzzle[2].mValue  = 8;
        mPuzzle[6].mValue  = 2;
        mPuzzle[10].mValue = 2;
-       mPuzzle[14].mValue = 0;
+       mPuzzle[14].mValue = 16;
 
        mPuzzle[3].mValue  = 2;
        mPuzzle[7].mValue  = 0;
-       mPuzzle[11].mValue = 2;
+       mPuzzle[11].mValue = 8;
        mPuzzle[15].mValue = 2;
 
     }
@@ -265,16 +382,18 @@ public:
             this->TiltUp();
             break;
         case Cardinals::Right:
-            //this->TiltRight();
+            this->TiltRight();
             break;
         case Cardinals::Bottom:
             this->TiltDown();
             break;
         case Cardinals::Left:
+            this->TiltLeft();
             break;
         default:
             assert(false);
 	    }
+	    this->addNumber();
     }
 
     friend std::ostream& operator<<(std::ostream& Stream, Game const& Obj)
@@ -291,7 +410,7 @@ public:
             }
             Stream << '\n';
         }
-        Stream << "===================\n";
+        Stream << "=== Score: " << Obj.mScore << " ===\n";
         return Stream;
     }
 };

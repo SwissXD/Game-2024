@@ -10,4 +10,10 @@ int main()
     std::cout << test;
     test.tiltBoard(Cardinals::Bottom);
     std::cout << test;
+    test.tiltBoard(Cardinals::Top);
+    std::cout << test;
+    test.tiltBoard(Cardinals::Right);
+    std::cout << test;
+    test.tiltBoard(Cardinals::Left);
+    std::cout << test;
 }
